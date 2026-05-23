@@ -12,6 +12,9 @@ Supported fish:
 
 The system accepts fish data from the user and displays each fish type, its category, and the current number available in the aquarium.
 
+Inventory data is stored in a local SQLite database named `aquarium_inventory.db`.
+The database is created automatically the first time the program runs.
+
 ## Design Patterns
 
 ### Factory Pattern
@@ -28,10 +31,18 @@ The `AquariumInventory` class uses the Singleton pattern.
 
 Only one shared aquarium inventory object is created during the program. This ensures all fish records are stored in the same Auckland aquarium inventory.
 
+### SQLite Database
+
+The `fish_inventory` table stores each fish name, category, and quantity.
+
+If the same fish type is added more than once, the database updates the existing record by adding the new quantity to the saved quantity.
+
 ## Project Files
 
 - `aquarium.py`: Contains the fish classes, factory class, and singleton inventory class.
+- `database_manager.py`: Manages the SQLite database connection, table, and inventory queries.
 - `main.py`: Runs the console application and accepts user input.
+- `aquarium_inventory.db`: SQLite database created automatically when the app runs.
 - `README.md`: Explains the project and design patterns.
 
 ## How to Run

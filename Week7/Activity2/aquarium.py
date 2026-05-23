@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
 
+from database_manager import DatabaseManager
+
 
 class Fish(ABC):
     """Abstract product used by the FishFactory."""
@@ -70,7 +72,7 @@ class FishFactory(Factory):
 
 
 class AquariumInventory:
-    """Singleton Pattern: keeps one shared aquarium inventory for the app."""
+    """Singleton Pattern: keeps one shared SQLite-backed aquarium inventory."""
 
     # Class variable to hold the single instance of AquariumInventory
     _instance = None
@@ -79,24 +81,34 @@ class AquariumInventory:
     def __new__(cls):
         if cls._instance is None:
             cls._instance = super(AquariumInventory, cls).__new__(cls)
-            cls._instance._fish_records = {}
             cls._instance.location = "Auckland"
+            cls._instance.database_manager = DatabaseManager()
         return cls._instance
 
     # Add or update fish in the inventory
     def add_fish(self, fish):
-        if fish.name in self._fish_records:
-            self._fish_records[fish.name].quantity += fish.quantity
-        else:
-            self._fish_records[fish.name] = fish
+        self.database_manager.add_or_update_fish(
+            fish.name,
+            fish.category,
+            fish.quantity,
+        )
 
     # Retrieve all fish records as a list
     def get_all_fish(self):
-        return list(self._fish_records.values())
+        fish_records = []
+
+        rows = self.database_manager.get_all_fish()
+
+        for name, category, quantity in rows:
+            fish = FishFactory().create_fish(name, quantity)
+            fish.category = category
+            fish_records.append(fish)
+
+        return fish_records
 
     # Check if there are any fish in the inventory
     def has_fish(self):
-        return len(self._fish_records) > 0
+        return self.database_manager.has_fish()
 
     # Display the inventory in a user-friendly format
     def display_inventory(self):
