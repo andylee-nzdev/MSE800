@@ -1,8 +1,10 @@
+"""Data models for the user authentication system."""
+
 from dataclasses import asdict, dataclass
 
-# models.py
 @dataclass
 class User:
+    """Represents a user in the system."""
     full_name: str
     email: str
     date_of_birth: str
@@ -15,6 +17,7 @@ class User:
 
     @classmethod
     def from_dict(cls, data):
+        """Creates a User instance from a dictionary."""
         return cls(
             full_name=data["full_name"],
             email=data["email"],

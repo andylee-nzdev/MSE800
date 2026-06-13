@@ -1,3 +1,5 @@
+"""Authentication service module."""
+
 import base64
 import hashlib
 import hmac
@@ -9,6 +11,7 @@ from models import User
 
 
 class AuthService:
+    """Provides authentication services for user login, signup, and password management."""
     def __init__(self, storage):
         self.storage = storage
         self.users = storage.load_users()

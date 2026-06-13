@@ -1,9 +1,10 @@
+"""Main application module for the login and signup system."""
+
 from auth_service import AuthService
 from storage import UserStorage
 
-
 def main():
-    # Initialize the authentication service with user storage
+    """Entry point for the application."""
     auth_service = AuthService(UserStorage())
 
     while True:
@@ -31,8 +32,8 @@ def main():
             print("Invalid option. Please choose 1 to 5.")
 
 
-# The following functions handle user interactions for signing up, logging in, resetting passwords, and viewing profiles.
 def sign_up(auth_service):
+    """Handles the user sign-up process."""
     print("\nCreate Account")
     full_name = input("Full name: ")
     email = input("Email: ")
