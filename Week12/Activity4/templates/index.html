@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Loader</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        h1 {
+            color: #1a1a2e;
+            margin-bottom: 30px;
+        }
+
+        .upload-area {
+            width: 100%;
+            max-width: 700px;
+            border: 3px dashed #aab;
+            border-radius: 16px;
+            padding: 60px 20px;
+            text-align: center;
+            background: #fff;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+        }
+
+        .upload-area:hover,
+        .upload-area.dragover {
+            border-color: #4a90d9;
+            background: #eef4fb;
+        }
+
+        .upload-area p {
+            color: #666;
+            font-size: 1.1rem;
+            margin-bottom: 16px;
+        }
+
+        .upload-area .btn {
+            display: inline-block;
+            padding: 10px 28px;
+            background: #4a90d9;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .upload-area .btn:hover {
+            background: #357abd;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .image-container {
+            margin-top: 30px;
+            width: 100%;
+            max-width: 700px;
+            display: none;
+        }
+
+        .image-info {
+            background: #fff;
+            border-radius: 10px;
+            padding: 12px 20px;
+            margin-bottom: 12px;
+            color: #333;
+            font-size: 0.95rem;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+        }
+
+        .image-info.error {
+            color: #c0392b;
+        }
+
+        .image-container img {
+            width: 100%;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+        }
+    </style>
+</head>
+<body>
+    <h1>Image Loader</h1>
+
+    <div class="upload-area" id="uploadArea">
+        <p>Drag & drop an image here, or</p>
+        <button class="btn" id="browseBtn">Browse Files</button>
+        <input type="file" id="fileInput" accept="image/*">
+    </div>
+
+    <div class="image-container" id="imageContainer">
+        <div class="image-info" id="imageInfo"></div>
+        <img id="preview" alt="Uploaded image">
+    </div>
+
+    <script>
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const browseBtn = document.getElementById('browseBtn');
+        const imageContainer = document.getElementById('imageContainer');
+        const preview = document.getElementById('preview');
+        const imageInfo = document.getElementById('imageInfo');
+
+        browseBtn.addEventListener('click', () => fileInput.click());
+
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                uploadImage(file);
+            }
+        });
+
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files[0]) {
+                uploadImage(fileInput.files[0]);
+            }
+        });
+
+        async function uploadImage(file) {
+            imageInfo.classList.remove('error');
+            imageInfo.textContent = 'Uploading...';
+            imageContainer.style.display = 'block';
+            preview.style.display = 'none';
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('/upload', { method: 'POST', body: formData });
+                const data = await response.json();
+
+                if (!response.ok) {
+                    imageInfo.textContent = data.error;
+                    imageInfo.classList.add('error');
+                    return;
+                }
+
+                const size = (file.size / 1024).toFixed(1);
+                imageInfo.textContent = `${data.filename} — ${file.type} — ${size} KB`;
+                preview.src = data.url;
+                preview.style.display = 'block';
+            } catch {
+                imageInfo.textContent = 'Upload failed';
+                imageInfo.classList.add('error');
+            }
+        }
+    </script>
+</body>
+</html>
