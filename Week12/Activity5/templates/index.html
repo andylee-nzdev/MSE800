@@ -6,10 +6,18 @@
 </head>
 <body>
     <h1>BMI Calculator</h1>
-    <form action="/calculate" method="post">
+    <form action="/" method="post">
         <label>Weight in kilograms: <input type="text" name="weight"></label><br>
         <label>Height in meters: <input type="text" name="height"></label><br><br>
         <button type="submit">Calculate BMI</button>
     </form>
+
+    {% if bmi %}
+    <hr>
+    <h1>BMI Calculator Result</h1>
+    <p><strong>Your BMI is: {{ bmi }}</strong></p>
+    <p>You are classified as: {{ classification }}</p>
+    <a href="/">Calculate Again</a>
+    {% endif %}
 </body>
 </html>
